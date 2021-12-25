@@ -5,7 +5,7 @@
         <router-link class="header" :to="{ name: 'home' }">My Blog</router-link>
       </div>
       <div class="nav-links">
-        <ul>
+        <ul v-show="!mobile">
           <router-link class="link" :to="{ name: '#' }">Home</router-link>
           <router-link class="link" :to="{ name: '#' }">Blogs</router-link>
           <router-link class="link" :to="{ name: '#' }">Create</router-link>
@@ -15,9 +15,9 @@
         </ul>
       </div>
     </nav>
-    <menuIcon />
+    <menuIcon class="menu-icon" @click="toggleMobileNav" v-show="mobile" />
     <transition name="mobile-nav">
-      <ul>
+      <ul class="mobile-nav" v-show="mobileNav">
         <router-link class="link" :to="{ name: '#' }">Home</router-link>
         <router-link class="link" :to="{ name: '#' }">Blogs</router-link>
         <router-link class="link" :to="{ name: '#' }">Create</router-link>
@@ -35,6 +35,32 @@ export default {
   name: "navigation",
   components: {
     menuIcon,
+  },
+  data() {
+    return {
+      mobile: false,
+      mobileNav: false,
+      windowWidth: null,
+    };
+  },
+  methods: {
+    checkScreen() {
+      this.windowWidth = window.innerWidth;
+      if (this.windowWidth <= 750) {
+        this.mobile = true;
+        return;
+      }
+      this.mobile = false;
+      this.mobileNav = false;
+      return;
+    },
+    toggleMobileNav() {
+      this.mobileNav = !this.mobileNav;
+    },
+  },
+  created() {
+    window.addEventListener("resize", this.checkScreen);
+    this.checkScreen();
   },
 };
 </script>
@@ -70,5 +96,61 @@ nav {
       text-decoration: none;
     }
   }
+  .nav-links {
+    position: relative;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: flex-end;
+
+    ul {
+      margin-right: 32px;
+      .link {
+        margin-right: 32px;
+      }
+      .link:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}
+.menu-icon {
+  cursor: pointer;
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  height: 25px;
+  width: auto;
+}
+.mobile-nav {
+  padding: 20px;
+  width: 70%;
+  max-width: 250px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100%;
+  background-color: #303030;
+  top: 0;
+  left: 0;
+  .link {
+    padding: 15px 0;
+    color: white;
+  }
+}
+.mobile-nav-enter-active,
+.mobile-nav-leave-active {
+  transition: all 1s ease;
+}
+
+.mobile-nav-enter {
+  transform: translateX(-250px);
+}
+.mobile-nav-enter-to {
+  transform: translateX(0px);
+}
+
+.mobile-nav-leave-to {
+  transform: translateX(-250px);
 }
 </style>
